@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,44 +9,55 @@ import {
   Paper,
   Button,
 } from "@mui/material";
+import axios from "axios";
 
 function Home() {
-  const [files, setFiles] = useState([
-    {
-      name: "Thang.png",
-      sharedUsers: "N/A",
-      fileSize: "1 MB",
-      lastModified: "Dec 13, 2024",
-      link: "https://thangluunhu.xyz/",
-    },
-    {
-      name: "API.zip",
-      sharedUsers: "N/A",
-      fileSize: "242 MB",
-      lastModified: "Dec 12, 2023",
-      link: "https://api.nhuthangluu.id.vn/",
-    },
-  ]);
-
+  const [files, setFiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleFileUpload = (event) => {
-    const uploadedFiles = event.target.files;
-    const newFiles = Array.from(uploadedFiles).map((file) => ({
-      name: file.name,
-      fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-      lastModified: new Date(file.lastModified).toLocaleDateString,
-    }));
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/files");
+        setFiles(response.data.files || []);
+      } catch (error) {
+        console.error("Error fetching files:", error);
+      }
+    };
+
+    fetchFiles();
+  }, []);
+
+  const APISHARE = async (event) => {
+    const uploadedFile = event.target.files[0];
+    if (!uploadedFile) return;
+
+    const formData = new FormData();
+    formData.append("file", uploadedFile);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:5000/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const updatedFiles = await axios.get("http://127.0.0.1:5000/files");
+      setFiles(updatedFiles.data.files || []);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
   };
 
   const handleCopy = (link) => {
-    navigator.clipboard.writeText(link);
-    alert("Link copied: " + link);
+    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${link}`);
   };
 
   const filteredFiles = files.filter((file) =>
-    file.name.toLowerCase().includes(searchTerm.toLowerCase())
+    file.filename.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -76,8 +87,7 @@ function Home() {
           <input
             id="file-upload"
             type="file"
-            multiple
-            onChange={handleFileUpload}
+            onChange={APISHARE}
             className="hidden"
           />
         </div>
@@ -94,9 +104,6 @@ function Home() {
                     <strong>Name</strong>
                   </TableCell>
                   <TableCell align="center">
-                    <strong>Shared Users</strong>
-                  </TableCell>
-                  <TableCell align="center">
                     <strong>File Size</strong>
                   </TableCell>
                   <TableCell align="center">
@@ -110,15 +117,14 @@ function Home() {
               <TableBody>
                 {filteredFiles.map((file, index) => (
                   <TableRow key={index} hover>
-                    <TableCell>{file.name}</TableCell>
-                    <TableCell align="center">{file.sharedUsers}</TableCell>
-                    <TableCell align="center">{file.fileSize}</TableCell>
-                    <TableCell align="center">{file.lastModified}</TableCell>
+                    <TableCell>{file.filename}</TableCell>
+                    <TableCell align="center">{file.file_size}</TableCell>
+                    <TableCell align="center">{file.upload_date}</TableCell>
                     <TableCell align="center">
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleCopy(file.link)}
+                        onClick={() => handleCopy(file.file_id)}
                         disabled={file.link === "N/A"}
                       >
                         Copy Link
