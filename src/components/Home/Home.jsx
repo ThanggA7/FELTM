@@ -204,11 +204,18 @@ function Home() {
         <p className="text-lg font-[700] text-white ">Upload Files</p>
         <div className="w-full h-[200px] border rounded-lg flex items-center justify-center text-gray-500 mt-2">
           <div className="flex flex-col items-center gap-2">
-            <label htmlFor="file-upload" className="">
+            <label
+              htmlFor="file-upload"
+              className="w-[50px] h-[50px] bg-[#E4DDF4] flex items-center justify-center rounded-full cursor-pointer"
+            >
               <FontAwesomeIcon icon={faUpload} />
             </label>
-            <label className="">Drag and drop files, or Browse</label>
-            <label className="">Support zip and rar files</label>
+            <label className="text-[18px] text-[white] font-[700]">
+              Drag and drop files, or Browse
+            </label>
+            <label className="text-[14px] text-[white] font-[600]">
+              Support zip and rar files
+            </label>
           </div>
           <input
             id="file-upload"
@@ -220,7 +227,7 @@ function Home() {
       </div>
 
       <div>
-        <p className="text-lg font-semibold text-white">Your Files</p>
+        <p className="text-lg font-semibold text-[#E4DDF4]">Your Files</p>
         <div className="mt-4">
           <Paper className="w-full overflow-hidden">
             <TableContainer component={Paper} className="shadow-md">
