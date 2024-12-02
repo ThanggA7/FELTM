@@ -9,17 +9,25 @@ function App() {
 
   return (
     <div className="container mx-auto p-4">
-      {isAuthenticated ? (
+      {!isAuthenticated ? (
         isRegistering ? (
-          <Register setIsAuthenticated={setIsAuthenticated} />
+          <div
+            className="text-white h-full flex justify-center items-center bg-cover"
+            style={{ backgroundImage: "url('../src/assets/bg.png')" }}
+          >
+            <Register setIsAuthenticated={setIsAuthenticated} />
+          </div>
         ) : (
-          <Login setIsAuthenticated={setIsAuthenticated} />
+          <div
+            className="text-white h-[100vh] flex justify-center items-center bg-cover"
+            style={{ backgroundImage: "url('../src/assets/bg.png')" }}
+          >
+            <Login setIsAuthenticated={setIsAuthenticated} />
+          </div>
         )
       ) : (
         <Home />
       )}
-
-   
     </div>
   );
 }
