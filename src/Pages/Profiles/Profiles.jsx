@@ -21,6 +21,7 @@ function Profile() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
+  const [isVisible, setIsVisible] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -149,29 +150,64 @@ function Profile() {
           </Typography>
         </div>
       </div>
+      <Typography variant="h6" className="text-white font-bold mb-2">
+        Token của bạn
+      </Typography>
 
-      <div className="mb-6 flex flex-col gap-5">
+      <div className="w-full h-[50px]  rounded-[4px] mt-1">
+        <div className="relative w-full">
+          <input
+            value={token}
+            className="w-full h-full rounded-[4px] bg-transparent text-white text-[18px] border border-gray-300 p-2"
+            type={isVisible ? "text" : "password"}
+            readOnly
+          />
+          <button
+            type="button"
+            onClick={() => setIsVisible(!isVisible)}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white bg-gray-600 px-2 py-1 rounded hover:bg-gray-500"
+          >
+            {isVisible ? "Ẩn" : "Hiện"}
+          </button>
+        </div>
+      </div>
+      <div className="mb-6 flex flex-col gap-5 mt-3">
         <Typography variant="h6" className="text-white font-bold mb-2">
           Thay đổi mật khẩu
         </Typography>
-        <TextField
-          label="Mật khẩu mới"
-          type="password"
-          variant="outlined"
-          fullWidth
-          value={newPassword}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-        <TextField
-          className=""
-          label="Xác nhận mật khẩu"
-          type="password"
-          variant="outlined"
-          fullWidth
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+        <div className="">
+          <label
+            htmlFor="newPassword"
+            className="block text-sm font-medium text-[white]"
+          >
+            Mật khẩu mới
+          </label>
+          <input
+            placeholder="Nhập mật khẩu!"
+            id="newPassword"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-[white]"
+          />
+        </div>
+
+        <div className="">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-[white]"
+          >
+            Xác nhận mật khẩu
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            placeholder="Nhập lại mật khẩu!"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-[white]"
+          />
+        </div>
         <Button
           variant="contained"
           color="primary"
