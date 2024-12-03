@@ -31,14 +31,20 @@ function App() {
     <>
       {!isAuthenticated ? (
         isRegistering ? (
-          <div className="text-white h-[100vh] flex justify-center items-center bg-cover">
+          <div
+            className="text-white h-[100vh] flex justify-center items-center bg-cover "
+            style={{ backgroundImage: "url('../src/assets/bg.png')" }}
+          >
             <Register
               setIsAuthenticated={setIsAuthenticated}
               setIsRegistering={setIsRegistering}
             />
           </div>
         ) : (
-          <div className="text-white h-[100vh] flex justify-center items-center bg-cover">
+          <div
+            className="text-white h-[100vh] flex justify-center items-center bg-cover"
+            style={{ backgroundImage: "url('../src/assets/bg.png')" }}
+          >
             <Login
               setIsAuthenticated={setIsAuthenticated}
               handleRegisterRedirect={handleRegisterRedirect}
