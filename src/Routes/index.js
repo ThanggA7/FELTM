@@ -1,3 +1,4 @@
+import Login from "../components/Layout/Login/Login";
 import Friends from "../Pages/Friends/Friends";
 import Home from "../Pages/Home/Home";
 import ShareFiles from "../Pages/ShareFiles/ShareFile";
@@ -8,6 +9,7 @@ const PublicRouter = [
   { path: "/files", component: YourFiles },
   { path: "/share", component: ShareFiles },
   { path: "/friends", component: Friends },
+  { path: "/lg", component: Login },
 ];
 
 export default PublicRouter;
