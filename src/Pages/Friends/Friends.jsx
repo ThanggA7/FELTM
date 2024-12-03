@@ -19,16 +19,15 @@ function Friends() {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [friends, setFriends] = useState([]);
 
-  // Lấy danh sách bạn bè khi component mount
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/user", {
+        const response = await axios.get("http://127.0.0.1:5000/friends", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Dùng token từ localStorage
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        setFriends(response.data.friends || []); // Đảm bảo dữ liệu friends là một mảng
+        setFriends(response.data.friends || []);
       } catch (error) {
         console.error("Error fetching friends:", error);
       }
@@ -36,20 +35,17 @@ function Friends() {
 
     fetchFriends();
   }, []);
+  console.log(friends);
 
-  // Lấy danh sách lời mời kết bạn
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:5000/friend/requests",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        setPendingRequests(response.data.requests || []); // Đảm bảo dữ liệu requests là một mảng
+        const response = await axios.get("http://127.0.0.1:5000/friends", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setPendingRequests(response.data.requests || []);
       } catch (error) {
         console.error("Error fetching pending requests:", error);
       }
@@ -58,7 +54,6 @@ function Friends() {
     fetchPendingRequests();
   }, []);
 
-  // Gửi lời mời kết bạn
   const handleSendRequest = async () => {
     if (username.trim() === "") {
       setSnackbarMessage("Vui lòng nhập username!");
@@ -79,13 +74,12 @@ function Friends() {
       setOpenSnackbar(true);
       setUsername("");
     } catch (error) {
-      setSnackbarMessage("Gửi lời mời thất bại!");
+      setSnackbarMessage("Không có người dùng vui lòng nhập lại !");
       setOpenSnackbar(true);
       console.error("Error sending friend request:", error);
     }
   };
 
-  // Chấp nhận lời mời kết bạn
   const handleAcceptRequest = async (fromUser) => {
     try {
       await axios.post(
@@ -183,17 +177,16 @@ function Friends() {
         <div className="mt-6">
           <Paper className="p-4 bg-gray-800 text-white">
             <h3 className="text-lg font-semibold mb-4">Danh sách bạn bè</h3>
-            {friends.length === 0 ? (
-              <p>Hiện tại bạn chưa có bạn bè</p>
-            ) : (
-              <ul>
-                {friends.map((friend) => (
-                  <li key={friend} className="mb-2">
-                    {friend}
+            <ul>
+              {friends.map((fr, index) => {
+                return (
+                  <li className="flex items-center gap-4">
+                    <p>Tên: {fr.fullname} </p>
+                    <p>UserName: {fr.username} </p>
                   </li>
-                ))}
-              </ul>
-            )}
+                );
+              })}
+            </ul>
           </Paper>
         </div>
       </Box>

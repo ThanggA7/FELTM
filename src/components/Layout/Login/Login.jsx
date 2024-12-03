@@ -12,7 +12,6 @@ function Login({ setIsAuthenticated }) {
     const token = localStorage.getItem("token");
     if (token) {
       setIsAuthenticated(true);
-      navigate("/");
     }
   }, [navigate, setIsAuthenticated]);
 
@@ -29,7 +28,7 @@ function Login({ setIsAuthenticated }) {
 
       setErrorMessage("");
 
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       setErrorMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!");
     } finally {

@@ -28,19 +28,15 @@ function ShareFiles() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log(token);
 
     const fetchFiles = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/files", {
+        const response = await axios.get("http://127.0.0.1:5000/shared/files", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setFiles(response.data.files || []);
-        setSharedFiles(
-          response.data.files.filter((file) => file.shared_with_me)
-        ); // Ví dụ, lọc file có shared_with_me = true
+        setFiles(response.data.shared_files || []);
       } catch (error) {
         console.error("Error fetching files:", error);
       }
@@ -59,11 +55,23 @@ function ShareFiles() {
       }
     };
 
+    const chooseFile = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/files", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setSharedFiles(response.data.files || []);
+      } catch (error) {
+        console.error("Error fetching files:", error);
+      }
+    };
+    chooseFile();
     fetchFiles();
     fetchFriends();
   }, []);
-
-  // Chia sẻ file
+  console.log(sharedFiles);
   const handleShare = async () => {
     if (!selectedFriend || !selectedFile) {
       toast.error("Vui lòng chọn bạn bè và file để chia sẻ!");
@@ -74,8 +82,8 @@ function ShareFiles() {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://127.0.0.1:5000/share",
-        { fileId: selectedFile, username: selectedFriend },
+        "http://127.0.0.1:5000/friend/share",
+        { file_id: selectedFile, to_user: selectedFriend },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -104,7 +112,6 @@ function ShareFiles() {
           <Tab label="Share Files With Friends" className="text-white" />
         </Tabs>
 
-        {/* Tab 1: Files Shared With Me */}
         {tabIndex === 0 && (
           <TableContainer component={Paper} className="overflow-x-auto mt-4">
             <Table>
@@ -122,26 +129,26 @@ function ShareFiles() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sharedFiles.map((file, index) => (
-                  <TableRow key={index} hover className="hover:bg-gray-50">
-                    <TableCell className="text-gray-800">
-                      {file.filename}
-                    </TableCell>
-                    <TableCell align="center" className="text-gray-600">
-                      {file.shared_by}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {files.map((f, index) => {
+                  return (
+                    <TableRow key={index} hover className="hover:bg-gray-50">
+                      <TableCell className="text-gray-800">
+                        {f.filename}
+                      </TableCell>
+                      <TableCell align="center" className="text-gray-600">
+                        {f.shared_by}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
         )}
 
-        {/* Tab 2: Share Files With Friends */}
         {tabIndex === 1 && (
           <div className="mt-4">
             <div className="flex items-center mb-4">
-              {/* Select file to share */}
               <Select
                 value={selectedFile}
                 onChange={(e) => setSelectedFile(e.target.value)}
@@ -150,14 +157,13 @@ function ShareFiles() {
                 fullWidth
               >
                 <MenuItem value="">Chọn file</MenuItem>
-                {files.map((file) => (
+                {sharedFiles.map((file) => (
                   <MenuItem key={file.file_id} value={file.file_id}>
                     {file.filename}
                   </MenuItem>
                 ))}
               </Select>
 
-              {/* Select friend to share with */}
               <Select
                 value={selectedFriend}
                 onChange={(e) => setSelectedFriend(e.target.value)}
