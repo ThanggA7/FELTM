@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
-function Login({ setIsAuthenticated }) {
+function Login({ setIsAuthenticated, handleRegisterRedirect }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -103,9 +103,13 @@ function Login({ setIsAuthenticated }) {
           <div className="mt-4 text-center">
             <span className="text-sm text-white">
               New Here?{" "}
-              <Link to="/Register" className="text-blue-500 underline">
+              <button
+                onClick={handleRegisterRedirect}
+                to="/Register"
+                className="text-blue-500 underline"
+              >
                 Create an Account
-              </Link>
+              </button>
             </span>
           </div>
         </form>

@@ -13,6 +13,7 @@ import {
   Box,
   Select,
   MenuItem,
+  TextField,
 } from "@mui/material";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -71,10 +72,10 @@ function ShareFiles() {
     fetchFiles();
     fetchFriends();
   }, []);
-  console.log(sharedFiles);
+
   const handleShare = async () => {
     if (!selectedFriend || !selectedFile) {
-      toast.error("Vui lòng chọn bạn bè và file để chia sẻ!");
+      toast.error("Vui lòng nhập username và chọn file để chia sẻ!");
       return;
     }
 
@@ -109,7 +110,7 @@ function ShareFiles() {
           className="text-white"
         >
           <Tab label="Files Shared With Me" className="text-white" />
-          <Tab label="Share Files With Friends" className="text-white" />
+          <Tab label="Share Files With UserName" className="text-white" />
         </Tabs>
 
         {tabIndex === 0 && (
@@ -126,6 +127,12 @@ function ShareFiles() {
                   >
                     Shared By
                   </TableCell>
+                  <TableCell
+                    align="center"
+                    className="text-gray-600 font-medium"
+                  >
+                    Action
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -138,6 +145,16 @@ function ShareFiles() {
                       <TableCell align="center" className="text-gray-600">
                         {f.shared_by}
                       </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          href={f.download_link} // Link tải file
+                          rel="noopener noreferrer"
+                        >
+                          Download
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -148,13 +165,12 @@ function ShareFiles() {
 
         {tabIndex === 1 && (
           <div className="mt-4">
-            <div className="flex items-center mb-4">
+            <div className="flex justify-center items-center mb-4 gap-4">
               <Select
                 value={selectedFile}
                 onChange={(e) => setSelectedFile(e.target.value)}
                 displayEmpty
-                className="mr-4 bg-gray-800 text-white"
-                fullWidth
+                className="mr-4 bg-white text-white w-[850px]"
               >
                 <MenuItem value="">Chọn file</MenuItem>
                 {sharedFiles.map((file) => (
@@ -164,27 +180,19 @@ function ShareFiles() {
                 ))}
               </Select>
 
-              <Select
+              <TextField
+                placeholder="Nhập Username"
+                variant="outlined"
                 value={selectedFriend}
                 onChange={(e) => setSelectedFriend(e.target.value)}
-                displayEmpty
-                className="mr-4 bg-gray-800 text-white"
-                fullWidth
-              >
-                <MenuItem value="">Chọn bạn bè</MenuItem>
-                {friends.map((friend) => (
-                  <MenuItem key={friend.username} value={friend.username}>
-                    {friend.username}
-                  </MenuItem>
-                ))}
-              </Select>
+                className="mr-4 bg-[#dedede] text-white w-[250px]"
+              />
 
-              {/* Share button */}
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleShare}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded-lg"
+                className=" text-white font-semibold py-1 px-3 rounded-lg"
               >
                 Chia sẻ
               </Button>

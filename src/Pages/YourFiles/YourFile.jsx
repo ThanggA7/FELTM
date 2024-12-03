@@ -42,10 +42,12 @@ function YourFiles() {
     setPage(0);
   };
 
+  // Hàm sao chép link
   const handleCopy = (fileId) => {
     navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${fileId}`);
   };
 
+  // Paginate file
   const paginatedFiles = files.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage

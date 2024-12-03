@@ -13,7 +13,6 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // Kiểm tra dữ liệu đầu vào
     if (!fullName || !username || !password || !confirmPassword) {
       setErrorMessage("Vui lòng điền đầy đủ thông tin!");
       setSuccessMessage("");
@@ -26,7 +25,6 @@ function Register() {
       return;
     }
 
-    // Kiểm tra độ dài mật khẩu
     if (password.length < 6) {
       setErrorMessage("Mật khẩu phải có ít nhất 6 ký tự!");
       setSuccessMessage("");
@@ -41,7 +39,6 @@ function Register() {
         password,
       });
 
-      // Đăng ký thành công
       setSuccessMessage(response.data.message || "Đăng ký thành công!");
       setErrorMessage("");
       setFullName("");
