@@ -13,14 +13,17 @@ import TablePagination from "@mui/material/TablePagination";
 import axios from "axios";
 
 function YourFiles() {
-  const [files, setFiles] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(8);
-
+  const [files, setFiles] = useState([]); 
+  const [page, setPage] = useState(0); 
+  const [rowsPerPage, setRowsPerPage] = useState(8); 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/files");
+        const response = await axios.get("http://127.0.0.1:5000/files", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setFiles(response.data.files || []);
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -39,8 +42,8 @@ function YourFiles() {
     setPage(0);
   };
 
-  const handleCopy = (link) => {
-    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${link}`);
+  const handleCopy = (fileId) => {
+    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${fileId}`);
   };
 
   const paginatedFiles = files.slice(

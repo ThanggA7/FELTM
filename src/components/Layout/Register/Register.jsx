@@ -12,8 +12,23 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!fullName || !username || !password || !confirmPassword) {
+      setErrorMessage("Vui lòng điền đầy đủ thông tin!");
+      setSuccessMessage("");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setErrorMessage("Mật khẩu xác nhận không khớp!");
+      setSuccessMessage("");
+      return;
+    }
+
+    // Kiểm tra độ dài mật khẩu
+    if (password.length < 6) {
+      setErrorMessage("Mật khẩu phải có ít nhất 6 ký tự!");
       setSuccessMessage("");
       return;
     }
@@ -25,8 +40,14 @@ function Register() {
         username,
         password,
       });
+
+      // Đăng ký thành công
       setSuccessMessage(response.data.message || "Đăng ký thành công!");
       setErrorMessage("");
+      setFullName("");
+      setUsername("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (error) {
       setErrorMessage(
         error.response?.data?.error || "Đăng ký thất bại. Vui lòng thử lại!"
