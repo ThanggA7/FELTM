@@ -13,8 +13,30 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    // Validation
     if (!fullName || !username || !password || !confirmPassword) {
       setErrorMessage("Vui lòng điền đầy đủ thông tin!");
+      setSuccessMessage("");
+      return;
+    }
+
+    if (fullName.length < 3) {
+      setErrorMessage("Họ và tên phải có ít nhất 3 ký tự!");
+      setSuccessMessage("");
+      return;
+    }
+
+    if (username.length < 3) {
+      setErrorMessage("Tên đăng nhập phải có ít nhất 3 ký tự!");
+      setSuccessMessage("");
+      return;
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      setErrorMessage(
+        "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới!"
+      );
       setSuccessMessage("");
       return;
     }
@@ -34,9 +56,9 @@ function Register() {
     setIsLoading(true);
     try {
       const response = await axios.post("http://127.0.0.1:5000/register", {
-        fullName,
         username,
         password,
+        fullName,
       });
 
       setSuccessMessage(response.data.message || "Đăng ký thành công!");
@@ -47,7 +69,9 @@ function Register() {
       setConfirmPassword("");
     } catch (error) {
       setErrorMessage(
-        error.response?.data?.error || "Đăng ký thất bại. Vui lòng thử lại!"
+        error.response?.data?.error ||
+          error.message ||
+          "Đăng ký thất bại. Vui lòng thử lại!"
       );
       setSuccessMessage("");
     } finally {
@@ -67,7 +91,7 @@ function Register() {
         {successMessage && (
           <p className="text-green-500 text-center mb-4">{successMessage}</p>
         )}
-        <form onSubmit={handleRegister}>
+        <div>
           <div className="relative my-4">
             <input
               type="text"
@@ -133,13 +157,14 @@ function Register() {
             </label>
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={handleRegister}
             className="w-full text-[18px] mt-6 rounded-full bg-white text-emerald-800 hover:bg-emerald-600 hover:text-white py-2 transition-colors duration-300"
             disabled={isLoading}
           >
             {isLoading ? "Registering..." : "Register"}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

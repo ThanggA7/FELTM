@@ -31,7 +31,6 @@ function Profile() {
       return;
     }
 
-    // Fetch profile data
     axios
       .get("http://localhost:5000/user", {
         headers: {
@@ -58,13 +57,16 @@ function Profile() {
     if (file) {
       const formData = new FormData();
       formData.append("avatar", file);
-
       axios
-        .post("http://localhost:5000/user/update-avatar", formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .put(
+          "http://localhost:5000/user",
+          { avatar: formData },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((response) => {
           setAvatar(response.data.avatar);
           setSnackbarMessage("Cập nhật avatar thành công!");
@@ -95,9 +97,9 @@ function Profile() {
     }
 
     axios
-      .post(
-        "http://localhost:5000/user/change-password",
-        { newPassword },
+      .put(
+        "http://127.0.0.1:5000/user",
+        { password: newPassword },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -148,7 +150,7 @@ function Profile() {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 flex flex-col gap-5">
         <Typography variant="h6" className="text-white font-bold mb-2">
           Thay đổi mật khẩu
         </Typography>
@@ -158,10 +160,11 @@ function Profile() {
           variant="outlined"
           fullWidth
           value={newPassword}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           onChange={(e) => setNewPassword(e.target.value)}
-          className="mb-2"
         />
         <TextField
+          className=""
           label="Xác nhận mật khẩu"
           type="password"
           variant="outlined"
