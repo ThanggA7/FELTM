@@ -13,14 +13,20 @@ import TablePagination from "@mui/material/TablePagination";
 import axios from "axios";
 
 function YourFiles() {
-  const [files, setFiles] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [files, setFiles] = useState([]); // Lưu trữ danh sách file
+  const [page, setPage] = useState(0); // Trang hiện tại
+  const [rowsPerPage, setRowsPerPage] = useState(8); // Số hàng trên mỗi trang
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/files");
+        // Gọi API lấy danh sách file
+        const response = await axios.get("http://127.0.0.1:5000/files", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        // Giả sử API trả về danh sách file dưới dạng response.data.files
         setFiles(response.data.files || []);
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -30,19 +36,23 @@ function YourFiles() {
     fetchFiles();
   }, []);
 
+  // Hàm thay đổi trang
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Hàm thay đổi số hàng trên mỗi trang
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
-  const handleCopy = (link) => {
-    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${link}`);
+  // Hàm sao chép link
+  const handleCopy = (fileId) => {
+    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${fileId}`);
   };
 
+  // Paginate file
   const paginatedFiles = files.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -8,6 +8,13 @@ function Login({ setIsAuthenticated }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+      navigate("/");
+    }
+  }, [navigate, setIsAuthenticated]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,9 +24,12 @@ function Login({ setIsAuthenticated }) {
         username,
         password,
       });
-      setIsAuthenticated(true);
+
+      localStorage.setItem("token", response.data.token);
+
       setErrorMessage("");
-      navigate("/a");
+
+      navigate("/home");
     } catch (error) {
       setErrorMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!");
     } finally {
