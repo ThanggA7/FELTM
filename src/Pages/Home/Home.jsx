@@ -23,12 +23,18 @@ function Home() {
   const [files, setFiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
+  const [nameUser, getNameUser] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  console.log(nameUser);
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/files");
+        const response = await axios.get("http://127.0.0.1:5000/files", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setFiles(response.data.files || []);
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -57,23 +63,40 @@ function Home() {
     try {
       await axios.post("http://127.0.0.1:5000/upload", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      const updatedFiles = await axios.get("http://127.0.0.1:5000/files");
       setFiles(updatedFiles.data.files || []);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
 
-  const handleCopy = (link) => {
-    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${link}`);
+  useEffect(() => {
+    const GETNAME = async () => {
+      try {
+        const getUser = await axios.get("http://127.0.0.1:5000/user", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        getNameUser(getUser.data.fullname);
+      } catch (error) {}
+    };
+
+    GETNAME();
+  }, []);
+
+  const handleCopy = (fileId) => {
+    navigator.clipboard.writeText(`http://127.0.0.1:5000/download/${fileId}`);
   };
 
-  const filteredFiles = files.filter((file) =>
-    file.filename.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredFiles = files.filter(
+    (file) =>
+      file.filename &&
+      file.filename.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const paginatedFiles = filteredFiles.slice(
@@ -85,14 +108,13 @@ function Home() {
     <div className="p-4 space-y-12">
       <div className="flex items-center justify-between mb-[27px]">
         <p className="text-[30px] font-[700] text-[white] ">
-          Welcome Back, Thang
+          Welcome Back, {nameUser}
         </p>
-        <div className="flex items-center gap-3 border px-4 py-3 rounded-lg  w-[350px]">
+        <div className="flex items-center gap-3 border px-4 py-3 rounded-lg w-[350px]">
           <FontAwesomeIcon
             className="text-white text-[20px]"
             icon={faMagnifyingGlass}
           />
-
           <input
             type="text"
             placeholder="Search files..."
@@ -102,10 +124,11 @@ function Home() {
           />
         </div>
       </div>
-      <div className="">
+      {/* 
+      <div>
         <div className="flex items-center justify-between">
           <p className="text-[white] text-[20px] font-[800]">Recently Edited</p>
-          <a href="#!" className="text-[#6E47D5] font-[14px]  font-[700]">
+          <a href="#!" className="text-[#6E47D5] font-[14px] font-[700]">
             View all
           </a>
         </div>
@@ -143,91 +166,35 @@ function Home() {
             },
           }}
         >
-          <SwiperSlide>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="270"
-              height="250"
-              viewBox="0 0 309 272"
-              fill="none"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M0.450714 198.652C0.450714 290.106 0 270.16 91.9902 270.16H217.251C309 270.16 309 290.106 309 198.652V73.219C309 -18.1542 309 1.85653 230.241 1.85646H198.048C186.491 1.87255 175.61 7.2919 168.689 16.5386L161.963 24.062C158.169 28.3064 152.744 30.7329 147.051 30.73C139.504 30.7263 133.044 30.7208 124.601 30.7326H79.0488C0 30.7326 0 30.7326 0 118.809L0.450714 198.652Z"
-                fill="#dedede"
-              />
-            </svg>
-          </SwiperSlide>
-          <SwiperSlide>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="270"
-              height="250"
-              viewBox="0 0 309 272"
-              fill="none"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M0.450714 198.652C0.450714 290.106 0 270.16 91.9902 270.16H217.251C309 270.16 309 290.106 309 198.652V73.219C309 -18.1542 309 1.85653 230.241 1.85646H198.048C186.491 1.87255 175.61 7.2919 168.689 16.5386L161.963 24.062C158.169 28.3064 152.744 30.7329 147.051 30.73C139.504 30.7263 133.044 30.7208 124.601 30.7326H79.0488C0 30.7326 0 30.7326 0 118.809L0.450714 198.652Z"
-                fill="#dedede"
-              />
-            </svg>
-          </SwiperSlide>
-          <SwiperSlide>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="270"
-              height="250"
-              viewBox="0 0 309 272"
-              fill="none"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M0.450714 198.652C0.450714 290.106 0 270.16 91.9902 270.16H217.251C309 270.16 309 290.106 309 198.652V73.219C309 -18.1542 309 1.85653 230.241 1.85646H198.048C186.491 1.87255 175.61 7.2919 168.689 16.5386L161.963 24.062C158.169 28.3064 152.744 30.7329 147.051 30.73C139.504 30.7263 133.044 30.7208 124.601 30.7326H79.0488C0 30.7326 0 30.7326 0 118.809L0.450714 198.652Z"
-                fill="#dedede"
-              />
-            </svg>
-          </SwiperSlide>
-          <SwiperSlide>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="270"
-              height="250"
-              viewBox="0 0 309 272"
-              fill="none"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M0.450714 198.652C0.450714 290.106 0 270.16 91.9902 270.16H217.251C309 270.16 309 290.106 309 198.652V73.219C309 -18.1542 309 1.85653 230.241 1.85646H198.048C186.491 1.87255 175.61 7.2919 168.689 16.5386L161.963 24.062C158.169 28.3064 152.744 30.7329 147.051 30.73C139.504 30.7263 133.044 30.7208 124.601 30.7326H79.0488C0 30.7326 0 30.7326 0 118.809L0.450714 198.652Z"
-                fill="#dedede"
-              />
-            </svg>
-          </SwiperSlide>
-          <SwiperSlide>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="270"
-              height="250"
-              viewBox="0 0 309 272"
-              fill="none"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M0.450714 198.652C0.450714 290.106 0 270.16 91.9902 270.16H217.251C309 270.16 309 290.106 309 198.652V73.219C309 -18.1542 309 1.85653 230.241 1.85646H198.048C186.491 1.87255 175.61 7.2919 168.689 16.5386L161.963 24.062C158.169 28.3064 152.744 30.7329 147.051 30.73C139.504 30.7263 133.044 30.7208 124.601 30.7326H79.0488C0 30.7326 0 30.7326 0 118.809L0.450714 198.652Z"
-                fill="#dedede"
-              />
-            </svg>
-          </SwiperSlide>
-        </Swiper>
-      </div>
+          {files.slice(0, 5).map((file, index) => (
+            <SwiperSlide key={index}>
+              <div className="relative">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="309"
+                  height="272"
+                  viewBox="0 0 309 272"
+                  fill="none"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M0.450714 198.652C0.450714 290.106 0 270.16 91.9902 270.16H217.251C309 270.16 309 290.106 309 198.652V73.219C309 -18.1542 309 1.85653 230.241 1.85646H198.048C186.491 1.87255 175.61 7.2919 168.689 16.5386L161.963 24.062C158.169 28.3064 152.744 30.7329 147.051 30.73C139.504 30.7263 133.044 30.7208 124.601 30.7326H79.0488C0 30.7326 0 30.7326 0 118.809L0.450714 198.652Z"
+                    fill="#FAFAFA"
+                  />
+                </svg>
 
-      <div className="">
-        <p className="text-lg font-[700] text-white ">Upload Files</p>
+                <div>
+                  <img src="" alt="" />
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div> */}
+
+      <div>
+        <p className="text-lg font-[700] text-white">Upload Files</p>
         <div className="w-full h-[200px] border rounded-lg flex items-center justify-center text-gray-500 mt-2">
           <div className="flex flex-col items-center gap-2">
             <label

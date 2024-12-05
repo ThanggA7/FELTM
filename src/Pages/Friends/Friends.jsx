@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -9,33 +9,98 @@ import {
   Tabs,
   Box,
 } from "@mui/material";
+import axios from "axios";
 
 function Friends() {
-  // States quản lý các tab, email, lời mời và thông báo
   const [tabIndex, setTabIndex] = useState(0);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [pendingRequests, setPendingRequests] = useState([
-    "example1@gmail.com",
-    "example2@gmail.com",
-  ]);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [friends, setFriends] = useState([]);
 
-  const handleSendRequest = () => {
-    if (email.trim() === "") {
-      setSnackbarMessage("Vui lòng nhập email!");
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/friends", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setFriends(response.data.friends || []);
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    };
+
+    fetchFriends();
+  }, []);
+  console.log(friends);
+
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/friends", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setPendingRequests(response.data.requests || []);
+      } catch (error) {
+        console.error("Error fetching pending requests:", error);
+      }
+    };
+
+    fetchPendingRequests();
+  }, []);
+
+  const handleSendRequest = async () => {
+    if (username.trim() === "") {
+      setSnackbarMessage("Vui lòng nhập username!");
       setOpenSnackbar(true);
       return;
     }
-    setSnackbarMessage(`Đã gửi lời mời kết bạn đến ${email}`);
-    setOpenSnackbar(true);
-    setEmail("");
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:5000/friend/request",
+        { to_user: username },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setSnackbarMessage(`Đã gửi lời mời kết bạn đến ${username}`);
+      setOpenSnackbar(true);
+      setUsername("");
+    } catch (error) {
+      setSnackbarMessage("Không có người dùng vui lòng nhập lại !");
+      setOpenSnackbar(true);
+      console.error("Error sending friend request:", error);
+    }
   };
 
-  const handleAcceptRequest = (email) => {
-    setPendingRequests(pendingRequests.filter((request) => request !== email));
-    setSnackbarMessage(`Bạn đã kết bạn với ${email}`);
-    setOpenSnackbar(true);
+  const handleAcceptRequest = async (fromUser) => {
+    try {
+      await axios.post(
+        "http://127.0.0.1:5000/friend/accept",
+        { from_user: fromUser },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setSnackbarMessage(`Bạn đã kết bạn với ${fromUser}`);
+      setOpenSnackbar(true);
+      setPendingRequests((prev) =>
+        prev.filter((request) => request !== fromUser)
+      );
+    } catch (error) {
+      setSnackbarMessage("Chấp nhận lời mời thất bại!");
+      setOpenSnackbar(true);
+      console.error("Error accepting friend request:", error);
+    }
   };
 
   return (
@@ -57,13 +122,13 @@ function Friends() {
           <div className="mt-6">
             <Paper className="p-4 bg-gray-800 text-white">
               <TextField
-                label="Nhập email người nhận"
+                label="Nhập username người nhận"
                 variant="outlined"
                 fullWidth
                 className="mb-4"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                helperText="Vui lòng nhập email để gửi lời mời kết bạn"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                helperText="Vui lòng nhập username để gửi lời mời kết bạn"
               />
               <Button
                 variant="contained"
@@ -87,16 +152,16 @@ function Friends() {
                 <p>Hiện tại không có lời mời nào</p>
               ) : (
                 <ul>
-                  {pendingRequests.map((email) => (
+                  {pendingRequests.map((username) => (
                     <li
-                      key={email}
+                      key={username}
                       className="flex justify-between items-center mb-2"
                     >
-                      <span>{email}</span>
+                      <span>{username}</span>
                       <Button
                         variant="contained"
                         color="success"
-                        onClick={() => handleAcceptRequest(email)}
+                        onClick={() => handleAcceptRequest(username)}
                         className="ml-4"
                       >
                         Chấp nhận
@@ -108,7 +173,24 @@ function Friends() {
             </Paper>
           </div>
         )}
+
+        <div className="mt-6">
+          <Paper className="p-4 bg-gray-800 text-white">
+            <h3 className="text-lg font-semibold mb-4">Danh sách bạn bè</h3>
+            <ul>
+              {friends.map((fr, index) => {
+                return (
+                  <li className="flex items-center gap-4">
+                    <p>Tên: {fr.fullname} </p>
+                    <p>UserName: {fr.username} </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </Paper>
+        </div>
       </Box>
+
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
